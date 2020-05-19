@@ -4,19 +4,31 @@ package com.yuong.running.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 
 import com.app.permission.OnPermissionCallback;
 import com.app.permission.PermissionUtil;
 import com.yuong.running.R;
 import com.yuong.running.common.activity.BaseActivity;
+import com.yuong.running.common.constans.AppConfig;
+import com.yuong.running.common.utils.AppUtils;
 import com.yuong.running.common.utils.DeviceUtils;
 import com.yuong.running.common.utils.DialogUtils;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
+
+    private final static int MSG_LOCATION_SERVICE_OPENED = 1;
+    private final static int MSG_PERMISSIONS_APPLY_COMPLETED = 2;
+
 
     // 要申请的权限
     private static String[] PERMISSIONS = {
@@ -25,6 +37,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION};
 
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case MSG_LOCATION_SERVICE_OPENED:
+                    startSport();
+                    break;
+                case MSG_PERMISSIONS_APPLY_COMPLETED:
+                    startActivity(new Intent(MainActivity.this, SportActivity.class));
+                    break;
+            }
+        }
+    };
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_main;
@@ -32,7 +59,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initData(Bundle savedInstanceState) {
-
+        if (DeviceUtils.isOverMarshmallow()) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, 100);
+        }
     }
 
     @Override
@@ -42,30 +71,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void initListener() {
-        requestPermission();
-    }
 
-    //请求权限
-    private void requestPermission() {
-        PermissionUtil.with(this)
-                //.constantRequest()
-                .permission(PERMISSIONS)
-                .request(new OnPermissionCallback() {
-                    @Override
-                    public void onPermissionGranted(List<String> granted, boolean isAllGranted) {
-
-                    }
-
-                    @Override
-                    public void onPermissionDenied(List<String> denied, List<String> permanentDenied) {
-
-                    }
-
-                    @Override
-                    public void onPermissionComplete() {
-
-                    }
-                });
     }
 
 
@@ -84,15 +90,54 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             showLocationServiceTip();
             return;
         }
-        startActivity(new Intent(this, SportActivity.class));
+        applyPermission();
     }
 
     private void showLocationServiceTip() {
         DialogUtils.showCommonDialog(this, "运动提示", "运动跑步，需要位置服务", true, new DialogUtils.CommonCallBack() {
             @Override
             public void onClick() {
-
+                AppUtils.openLocationSetting(MainActivity.this);
             }
         });
+    }
+
+    //请求权限
+    private void applyPermission() {
+        PermissionUtil.with(this)
+                .constantRequest()
+                .permission(PERMISSIONS)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onPermissionGranted(List<String> granted, boolean isAllGranted) {
+                        if (isAllGranted) {
+                            sendMessage(MSG_PERMISSIONS_APPLY_COMPLETED);
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionDenied(List<String> denied, List<String> permanentDenied) {
+
+                    }
+
+                    @Override
+                    public void onPermissionComplete() {
+
+                    }
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AppConfig.LOCATION_SERVICE_REQUEST_CODE) {
+            sendMessage(MSG_LOCATION_SERVICE_OPENED);
+        }
+    }
+
+    private void sendMessage(int what) {
+        Message msg = mHandler.obtainMessage();
+        msg.what = what;
+        mHandler.sendMessage(msg);
     }
 }
