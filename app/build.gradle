@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'yuong'
             keyPassword '123456'
-            storeFile file('D:/de/keystore/private/yuong.jks')
+            storeFile file('../yuong.jks')
             storePassword '123456'
         }
     }
