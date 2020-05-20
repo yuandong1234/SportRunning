@@ -41,12 +41,17 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
+    <!--如果设置了target >= 28 如果需要启动后台定位则必须声明这个权限-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <!--如果您的应用需要后台定位权限，且有可能运行在Android Q设备上,并且设置了target>28，必须增加这个权限声明-->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/icon_sport"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon_sport"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
@@ -58,7 +63,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.SportActivity"/>
+
+        <activity
+            android:name=".ui.activity.SportActivity"
+            android:launchMode="singleTask" />
+        <activity android:name=".ui.activity.SportMapActivity" />
+
+        <service android:name=".service.SportService" />
+
+        <!--高德-->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="29a4b870fa4385ab1c60a7dfaae7ea25"/>
+        <!-- 定位需要的服务 适配Android Q需要加上android:foregroundServiceType="location"-->
+        <service
+            android:name="com.amap.api.location.APSService"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>

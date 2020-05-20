@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'yuong'
+            keyPassword '123456'
+            storeFile file('D:/de/keystore/private/yuong.jks')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.yuong.running"
@@ -9,18 +17,28 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+        ndk {
+            //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
+            abiFilters 'armeabi', 'armeabi-v7a', 'x86'
+            // 还可以添加 , 'x86_64', 'mips', 'mips64', 'arm64-v8a', "arm64-v8a"
+        }
     }
-
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
         }
     }
-
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+
+        debug {
+            minifyEnabled false
+            buildConfigField "boolean", "DEBUG_MODE", "true"
+            signingConfig signingConfigs.config
         }
     }
 }
@@ -30,5 +48,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
     implementation 'androidx.appcompat:appcompat:1.2.0-beta01'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'org.greenrobot:eventbus:3.2.0'
     implementation project(':PermissionLibrary')
 }

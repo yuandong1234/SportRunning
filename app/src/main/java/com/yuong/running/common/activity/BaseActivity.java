@@ -24,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    protected String TAG = BaseActivity.class.getSimpleName();
+    protected String TAG = this.getClass().getSimpleName();
     protected boolean isActive = true; //是否活跃
 
     private InputMethodManager imm;
@@ -71,10 +71,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        initData(savedInstanceState);
         initView();
         initListener();
+        initData(savedInstanceState);
     }
 
     public abstract int getLayoutId();

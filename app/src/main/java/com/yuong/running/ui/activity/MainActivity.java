@@ -30,6 +30,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private final static int MSG_PERMISSIONS_APPLY_COMPLETED = 2;
 
 
+
     // 要申请的权限
     private static String[] PERMISSIONS = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
