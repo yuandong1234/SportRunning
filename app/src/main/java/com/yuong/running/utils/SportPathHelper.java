@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 运动轨迹数据处理
  */
-public class SportLocationUtils {
+public class SportPathHelper {
     private PathRecord mPathRecord;
     private AMapLocation mMapLocation;
 
@@ -18,14 +18,14 @@ public class SportLocationUtils {
         return mPathRecord;
     }
 
-    private SportLocationUtils() {
+    private SportPathHelper() {
     }
 
     private static class SingletonHolder {
-        private static final SportLocationUtils INSTANCE = new SportLocationUtils();
+        private static final SportPathHelper INSTANCE = new SportPathHelper();
     }
 
-    public static SportLocationUtils getInstance() {
+    public static SportPathHelper getInstance() {
         return SingletonHolder.INSTANCE;
     }
 

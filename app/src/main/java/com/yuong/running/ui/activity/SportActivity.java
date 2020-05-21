@@ -16,7 +16,7 @@ import com.yuong.running.common.activity.BaseActivity;
 import com.yuong.running.common.utils.LogUtils;
 import com.yuong.running.eventbus.LocationEvent;
 import com.yuong.running.service.SportService;
-import com.yuong.running.utils.SportLocationUtils;
+import com.yuong.running.utils.SportPathHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,7 +55,7 @@ public class SportActivity extends BaseActivity implements View.OnClickListener 
         }
     };
 
-    private SportLocationUtils mSportLocationHelper;
+    private SportPathHelper mSportLocationHelper;
 
 
     @Override
@@ -69,7 +69,7 @@ public class SportActivity extends BaseActivity implements View.OnClickListener 
         if (!isBind) {
             bindService();
         }
-        mSportLocationHelper = SportLocationUtils.getInstance();
+        mSportLocationHelper = SportPathHelper.getInstance();
         mSportLocationHelper.init();
     }
 

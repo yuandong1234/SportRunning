@@ -48,6 +48,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     break;
                 case MSG_PERMISSIONS_APPLY_COMPLETED:
                     startActivity(new Intent(MainActivity.this, SportActivity.class));
+//                    startActivity(new Intent(MainActivity.this, SportMapActivity.class));
                     break;
             }
         }

@@ -32,46 +32,4 @@
             android:textSize="14sp" />
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        android:paddingBottom="30dp">
-
-        <TextView
-            android:id="@+id/tv_complete"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:background="@drawable/btn_sport_white_round"
-            android:gravity="center"
-            android:text="完成"
-            android:textColor="@color/color_6BC4A2"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/tv_pause"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/btn_sport_white_round"
-            android:gravity="center"
-            android:text="暂停"
-            android:textColor="@color/color_6BC4A2"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/tv_continue"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:background="@drawable/btn_sport_white_round"
-            android:gravity="center"
-            android:text="继续"
-            android:textColor="@color/color_6BC4A2"
-            android:textSize="18sp" />
-
-    </LinearLayout>
 </RelativeLayout>

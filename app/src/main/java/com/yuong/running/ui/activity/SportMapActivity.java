@@ -3,7 +3,6 @@ package com.yuong.running.ui.activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMap;
@@ -17,36 +16,27 @@ import com.amap.api.maps.model.MyLocationStyle;
 import com.yuong.running.R;
 import com.yuong.running.common.activity.BaseActivity;
 import com.yuong.running.common.utils.LogUtils;
-import com.yuong.running.utils.SportLocationUtils;
+import com.yuong.running.eventbus.LocationEvent;
+import com.yuong.running.utils.LocationUtils;
+import com.yuong.running.utils.SportPathHelper;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * 地图运动轨迹
  */
-public class SportMapActivity extends BaseActivity {
+public class SportMapActivity extends BaseActivity implements LocationSource {
 
     private MapView mapView;
     private LinearLayout llMode;
-    private TextView tvComplete;
-    private TextView tvPause;
-    private TextView tvContinue;
 
     private AMap aMap;
-    private SportLocationUtils mSportLocationUtils;
-
-    private LocationSource locationSource = new LocationSource() {
-        @Override
-        public void activate(OnLocationChangedListener onLocationChangedListener) {
-            LogUtils.e("**************************************");
-//            AMapLocation location = mSportLocationUtils.getMapLocation();
-//            onLocationChangedListener.onLocationChanged(location);
-//            aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 16));
-        }
-
-        @Override
-        public void deactivate() {
-
-        }
-    };
+    private SportPathHelper mSportLocationUtils;
+    private LocationUtils mLocationUtils;
+    private OnLocationChangedListener mListener;
+    private boolean mFirstFix = false;
 
     @Override
     public int getLayoutId() {
@@ -57,9 +47,6 @@ public class SportMapActivity extends BaseActivity {
     public void initView() {
         mapView = findViewById(R.id.mapView);
         llMode = findViewById(R.id.ll_mode);
-        tvComplete = findViewById(R.id.tv_complete);
-        tvPause = findViewById(R.id.tv_pause);
-        tvContinue = findViewById(R.id.tv_continue);
     }
 
     @Override
@@ -70,7 +57,9 @@ public class SportMapActivity extends BaseActivity {
 
     @Override
     public void initData(Bundle savedInstanceState) {
-        mSportLocationUtils = SportLocationUtils.getInstance();
+        EventBus.getDefault().register(this);
+        mSportLocationUtils = SportPathHelper.getInstance();
+        mLocationUtils = LocationUtils.getInstance();
         mapView.onCreate(savedInstanceState);// 此方法必须重写
         initMap();
     }
@@ -82,21 +71,30 @@ public class SportMapActivity extends BaseActivity {
         settings.setZoomControlsEnabled(false);// 设置默认缩放按钮是否显示
         settings.setCompassEnabled(false);// 设置默认指南针是否显示
         settings.setScaleControlsEnabled(true);
-        setPointIcon();
-        //aMap.setLocationSource(locationSource);// 设置定位监听
+
+        aMap.setLocationSource(this);//设置定位监听
+
+        // 自定义系统定位蓝点
+        MyLocationStyle myLocationStyle = new MyLocationStyle();
+        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_location_point));// 设置蓝点的图标
+        myLocationStyle.strokeColor(Color.TRANSPARENT);// 设置圆形的边框颜色
+        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));// 设置圆形的填充颜色
+        // 设置定位的类型为定位模式 ，定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        aMap.setMyLocationStyle(myLocationStyle);
+
         aMap.setMyLocationEnabled(true);
     }
 
-    private void setPointIcon() {
-        // 自定义系统定位小蓝点
-        MyLocationStyle myLocationStyle = new MyLocationStyle();
-        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_location_point));// 设置小蓝点的图标
-        // 设置定位的类型为定位模式 ，定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
-        myLocationStyle.interval(2000);//设置发起定位请求的时间间隔
-        myLocationStyle.showMyLocation(true);//设置是否显示定位小蓝点，true 显示，false不显示
-        myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
-        aMap.setMyLocationStyle(myLocationStyle);
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+        mFirstFix = false;
+        mListener = onLocationChangedListener;
+    }
+
+    @Override
+    public void deactivate() {
+
     }
 
 
@@ -122,6 +120,24 @@ public class SportMapActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         mapView.onDestroy();
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocationEvent(LocationEvent event) {
+        AMapLocation location = event.getaMapLocation();
+        LogUtils.i(TAG, "longitude : " + location.getLongitude());
+        LogUtils.i(TAG, "latitude : " + location.getLatitude());
+
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        if (!mFirstFix) {
+            mFirstFix = true;
+            mListener.onLocationChanged(location);// 显示系统小蓝点
+            aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+        } else {
+            aMap.animateCamera(CameraUpdateFactory.changeLatLng(latLng));
+        }
     }
 }
