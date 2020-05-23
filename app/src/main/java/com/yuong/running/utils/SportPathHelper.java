@@ -4,6 +4,9 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
 import com.yuong.running.bean.PathRecord;
+import com.yuong.running.eventbus.UpdatePathEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -12,13 +15,13 @@ import java.util.List;
  */
 public class SportPathHelper {
     private PathRecord mPathRecord;
-    private AMapLocation mMapLocation;
 
     public PathRecord getPathRecord() {
         return mPathRecord;
     }
 
     private SportPathHelper() {
+
     }
 
     private static class SingletonHolder {
@@ -33,14 +36,13 @@ public class SportPathHelper {
         mPathRecord = new PathRecord();
     }
 
-    public AMapLocation getMapLocation() {
-        return mMapLocation;
-    }
 
     public void updateLocation(AMapLocation location) {
-        mMapLocation = location;
         mPathRecord.addpoint(new LatLng(location.getLatitude(), location.getLongitude()));
         //mPathRecord.setDistance(getDistance(mPathRecord.getPathLinePoints()));
+
+        //更新地图轨迹
+        EventBus.getDefault().post(new UpdatePathEvent(location));
     }
 
     //计算距离

@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.amap.api.location.AMapLocation;
 import com.yuong.running.R;
 import com.yuong.running.common.activity.BaseActivity;
 import com.yuong.running.common.utils.LogUtils;
@@ -56,6 +57,8 @@ public class SportActivity extends BaseActivity implements View.OnClickListener 
     };
 
     private SportPathHelper mSportLocationHelper;
+    private double mLastLongitude;
+    private double mLastLatitude;
 
 
     @Override
@@ -128,8 +131,13 @@ public class SportActivity extends BaseActivity implements View.OnClickListener 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationEvent(LocationEvent event) {
-        LogUtils.i(TAG, "longitude : " + event.getaMapLocation().getLongitude());
-        LogUtils.i(TAG, "latitude : " + event.getaMapLocation().getLatitude());
-        mSportLocationHelper.updateLocation(event.getaMapLocation());
+        AMapLocation location = event.getaMapLocation();
+        if (location.getLongitude() != mLastLongitude && location.getLatitude() != mLastLatitude) {
+            LogUtils.i(TAG, "longitude : " + event.getaMapLocation().getLongitude());
+            LogUtils.i(TAG, "latitude : " + event.getaMapLocation().getLatitude());
+            mLastLongitude = location.getLongitude();
+            mLastLatitude = location.getLatitude();
+            mSportLocationHelper.updateLocation(event.getaMapLocation());
+        }
     }
 }

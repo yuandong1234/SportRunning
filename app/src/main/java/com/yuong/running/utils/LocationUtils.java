@@ -46,7 +46,7 @@ public class LocationUtils {
         mLocationOption.setWifiScan(true); //可选，设置是否开启wifi扫描。默认为true，如果设置为false会同时停止主动刷新，停止以后完全依赖于系统刷新，定位位置可能存在误差
         mLocationOption.setLocationCacheEnable(true); //可选，设置是否使用缓存定位，默认为true
         mLocationOption.setGeoLanguage(AMapLocationClientOption.GeoLanguage.ZH);//可选，设置逆地理信息的语言，默认值为默认语言（根据所在地区选择语言）
-        mLocationOption.setNeedAddress(true);
+//        mLocationOption.setNeedAddress(true);
         mLocationClient.setLocationOption(mLocationOption);
 
         // 设置定位监听
@@ -77,9 +77,9 @@ public class LocationUtils {
      */
     public void start() {
         LogUtils.i(TAG, "****************开启高德定位**************************");
-        if (mLocationClient != null) {
-            mLocationClient.startLocation();
-        }
+        if (mLocationClient == null) init();
+
+        mLocationClient.startLocation();
     }
 
     /**
