@@ -76,7 +76,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onPressClick() {
                 Toast.makeText(MainActivity.this, "长按完成结束........", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(MainActivity.this, MapTrackActivity.class));
+//                startActivity(new Intent(MainActivity.this, MapTrackActivity.class));
+                startActivity(new Intent(MainActivity.this, MyRunningTrackActivity.class));
             }
         });
     }

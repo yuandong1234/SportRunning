@@ -80,6 +80,8 @@
             android:foregroundServiceType="location" />
 
         <activity android:name=".ui.activity.MapTrackActivity"></activity>
+
+        <activity android:name=".ui.activity.MyRunningTrackActivity"></activity>
     </application>
 
 </manifest>
