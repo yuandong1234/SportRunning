@@ -15,4 +15,11 @@
         <attr name="ProgressText_color" format="color" />
 
     </declare-styleable>
+
+    <declare-styleable name="SportProgressView">
+        <attr name="sportProgressView_color" format="color" />        <!--进度圆环颜色-->
+        <attr name="sportProgressView_stroke_width" format="dimension" />        <!--进度圆环宽度-->
+        <attr name="sportProgressView_progress" format="integer" />       <!--圆环进度-->
+    </declare-styleable>
+
 </resources>

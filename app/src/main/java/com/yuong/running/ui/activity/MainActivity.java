@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.Toast;
 
 import com.app.permission.OnPermissionCallback;
 import com.app.permission.PermissionUtil;
@@ -16,6 +17,7 @@ import com.yuong.running.common.constans.AppConfig;
 import com.yuong.running.common.utils.AppUtils;
 import com.yuong.running.common.utils.DeviceUtils;
 import com.yuong.running.common.utils.DialogUtils;
+import com.yuong.running.widget.PressProgressView;
 
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private final static int MSG_LOCATION_SERVICE_OPENED = 1;
     private final static int MSG_PERMISSIONS_APPLY_COMPLETED = 2;
 
-
+    private PressProgressView pressProgressView;
 
     // 要申请的权限
     private static String[] PERMISSIONS = {
@@ -69,6 +71,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void initView() {
         findViewById(R.id.tv_start).setOnClickListener(this);
+        pressProgressView = findViewById(R.id.pressProgressView);
+        pressProgressView.setOnPressClickListener(new PressProgressView.OnPressClickListener() {
+            @Override
+            public void onPressClick() {
+                Toast.makeText(MainActivity.this, "长按完成结束........", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(MainActivity.this, MapTrackActivity.class));
+                startActivity(new Intent(MainActivity.this, MyRunningTrackActivity.class));
+            }
+        });
     }
 
     @Override

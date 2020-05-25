@@ -1,5 +1,7 @@
 package com.yuong.running.utils;
 
+import android.util.Log;
+
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
 
@@ -12,9 +14,9 @@ import java.util.List;
  * <p>
  * 使用方法：
  * <p>
- * PathSmoothTool pathSmoothTool = new PathSmoothTool();
- * pathSmoothTool.setIntensity(2);//设置滤波强度，默认3
- * List<LatLng> mList = LatpathSmoothTool.kalmanFilterPath(list);
+ *     PathSmoothTool pathSmoothTool = new PathSmoothTool();
+ *     pathSmoothTool.setIntensity(2);//设置滤波强度，默认3
+ *     List<LatLng> mList = LatpathSmoothTool.kalmanFilterPath(list);
  */
 
 public class PathSmoothTool {
@@ -22,7 +24,7 @@ public class PathSmoothTool {
     private float mThreshhold = 0.3f;
     private float mNoiseThreshhold = 10;
 
-    public PathSmoothTool() {
+    public PathSmoothTool(){
 
     }
 
@@ -48,15 +50,14 @@ public class PathSmoothTool {
 
     /**
      * 轨迹平滑优化
-     *
      * @param originlist 原始轨迹list,list.size大于2
      * @return 优化后轨迹list
      */
-    public List<LatLng> pathOptimize(List<LatLng> originlist) {
+    public List<LatLng> pathOptimize(List<LatLng> originlist){
 
         List<LatLng> list = removeNoisePoint(originlist);//去噪
-        List<LatLng> afterList = kalmanFilterPath(list, mIntensity);//滤波
-        List<LatLng> pathoptimizeList = reducerVerticalThreshold(afterList, mThreshhold);//抽稀
+        List<LatLng> afterList = kalmanFilterPath(list,mIntensity);//滤波
+        List<LatLng> pathoptimizeList = reducerVerticalThreshold(afterList,mThreshhold);//抽稀
 //        Log.i("MY","originlist: "+originlist.size());
 //        Log.i("MY","list: "+list.size());
 //        Log.i("MY","afterList: "+afterList.size());
@@ -66,55 +67,50 @@ public class PathSmoothTool {
 
     /**
      * 轨迹线路滤波
-     *
      * @param originlist 原始轨迹list,list.size大于2
      * @return 滤波处理后的轨迹list
      */
     public List<LatLng> kalmanFilterPath(List<LatLng> originlist) {
-        return kalmanFilterPath(originlist, mIntensity);
+        return kalmanFilterPath(originlist,mIntensity);
     }
 
 
     /**
      * 轨迹去噪，删除垂距大于20m的点
-     *
      * @param originlist 原始轨迹list,list.size大于2
      * @return
      */
-    public List<LatLng> removeNoisePoint(List<LatLng> originlist) {
-        return reduceNoisePoint(originlist, mNoiseThreshhold);
+    public List<LatLng> removeNoisePoint(List<LatLng> originlist){
+        return reduceNoisePoint(originlist,mNoiseThreshhold);
     }
 
     /**
      * 单点滤波
-     *
      * @param lastLoc 上次定位点坐标
-     * @param curLoc  本次定位点坐标
+     * @param curLoc 本次定位点坐标
      * @return 滤波后本次定位点坐标值
      */
     public LatLng kalmanFilterPoint(LatLng lastLoc, LatLng curLoc) {
-        return kalmanFilterPoint(lastLoc, curLoc, mIntensity);
+        return kalmanFilterPoint(lastLoc,curLoc,mIntensity);
     }
 
     /**
      * 轨迹抽稀
-     *
      * @param inPoints 待抽稀的轨迹list，至少包含两个点，删除垂距小于mThreshhold的点
      * @return 抽稀后的轨迹list
      */
     public List<LatLng> reducerVerticalThreshold(List<LatLng> inPoints) {
-        return reducerVerticalThreshold(inPoints, mThreshhold);
+        return reducerVerticalThreshold(inPoints,mThreshhold);
     }
 
     /********************************************************************************************************/
     /**
      * 轨迹线路滤波
-     *
      * @param originlist 原始轨迹list,list.size大于2
-     * @param intensity  滤波强度（1—5）
+     * @param intensity 滤波强度（1—5）
      * @return
      */
-    private List<LatLng> kalmanFilterPath(List<LatLng> originlist, int intensity) {
+    private List<LatLng> kalmanFilterPath(List<LatLng> originlist,int intensity) {
         List<LatLng> kalmanFilterList = new ArrayList<LatLng>();
         if (originlist == null || originlist.size() <= 2)
             return kalmanFilterList;
@@ -124,7 +120,7 @@ public class PathSmoothTool {
         kalmanFilterList.add(lastLoc);
         for (int i = 1; i < originlist.size(); i++) {
             LatLng curLoc = originlist.get(i);
-            latLng = kalmanFilterPoint(lastLoc, curLoc, intensity);
+            latLng = kalmanFilterPoint(lastLoc,curLoc,intensity);
             if (latLng != null) {
                 kalmanFilterList.add(latLng);
                 lastLoc = latLng;
@@ -135,27 +131,26 @@ public class PathSmoothTool {
 
     /**
      * 单点滤波
-     *
-     * @param lastLoc   上次定位点坐标
-     * @param curLoc    本次定位点坐标
+     * @param lastLoc 上次定位点坐标
+     * @param curLoc 本次定位点坐标
      * @param intensity 滤波强度（1—5）
      * @return 滤波后本次定位点坐标值
      */
     private LatLng kalmanFilterPoint(LatLng lastLoc, LatLng curLoc, int intensity) {
-        if (pdelt_x == 0 || pdelt_y == 0) {
+        if (pdelt_x == 0 || pdelt_y == 0 ){
             initial();
         }
         LatLng kalmanLatlng = null;
-        if (lastLoc == null || curLoc == null) {
+        if (lastLoc == null || curLoc == null){
             return kalmanLatlng;
         }
-        if (intensity < 1) {
+        if (intensity < 1){
             intensity = 1;
-        } else if (intensity > 5) {
+        } else if (intensity > 5){
             intensity = 5;
         }
-        for (int j = 0; j < intensity; j++) {
-            kalmanLatlng = kalmanFilter(lastLoc.longitude, curLoc.longitude, lastLoc.latitude, curLoc.latitude);
+        for (int j = 0; j < intensity; j++){
+            kalmanLatlng = kalmanFilter(lastLoc.longitude,curLoc.longitude,lastLoc.latitude,curLoc.latitude);
             curLoc = kalmanLatlng;
         }
         return kalmanLatlng;
@@ -178,35 +173,33 @@ public class PathSmoothTool {
     private double kalmanGain_x; //卡尔曼增益
     private double kalmanGain_y; //卡尔曼增益
 
-    private double m_R = 0;
-    private double m_Q = 0;
-
+    private double m_R= 0;
+    private double m_Q= 0;
     //初始模型
-    private void initial() {
-        pdelt_x = 0.001;
-        pdelt_y = 0.001;
+    private void initial(){
+        pdelt_x =  0.001;
+        pdelt_y =  0.001;
 //        mdelt_x = 0;
 //        mdelt_y = 0;
-        mdelt_x = 5.698402909980532E-4;
-        mdelt_y = 5.698402909980532E-4;
+        mdelt_x =  5.698402909980532E-4;
+        mdelt_y =  5.698402909980532E-4;
     }
-
-    private LatLng kalmanFilter(double oldValue_x, double value_x, double oldValue_y, double value_y) {
+    private LatLng kalmanFilter(double oldValue_x, double value_x, double oldValue_y, double value_y){
         lastLocation_x = oldValue_x;
-        currentLocation_x = value_x;
-        gauss_x = Math.sqrt(pdelt_x * pdelt_x + mdelt_x * mdelt_x) + m_Q;     //计算高斯噪音偏差
-        kalmanGain_x = Math.sqrt((gauss_x * gauss_x) / (gauss_x * gauss_x + pdelt_x * pdelt_x)) + m_R; //计算卡尔曼增益
+        currentLocation_x= value_x;
+        gauss_x = Math.sqrt(pdelt_x * pdelt_x + mdelt_x * mdelt_x)+m_Q;     //计算高斯噪音偏差
+        kalmanGain_x = Math.sqrt((gauss_x * gauss_x)/(gauss_x * gauss_x + pdelt_x * pdelt_x)) +m_R; //计算卡尔曼增益
         estimate_x = kalmanGain_x * (currentLocation_x - lastLocation_x) + lastLocation_x;    //修正定位点
-        mdelt_x = Math.sqrt((1 - kalmanGain_x) * gauss_x * gauss_x);      //修正模型偏差
+        mdelt_x = Math.sqrt((1-kalmanGain_x) * gauss_x *gauss_x);      //修正模型偏差
 
         lastLocation_y = oldValue_y;
         currentLocation_y = value_y;
-        gauss_y = Math.sqrt(pdelt_y * pdelt_y + mdelt_y * mdelt_y) + m_Q;     //计算高斯噪音偏差
-        kalmanGain_y = Math.sqrt((gauss_y * gauss_y) / (gauss_y * gauss_y + pdelt_y * pdelt_y)) + m_R; //计算卡尔曼增益
+        gauss_y = Math.sqrt(pdelt_y * pdelt_y + mdelt_y * mdelt_y)+m_Q;     //计算高斯噪音偏差
+        kalmanGain_y = Math.sqrt((gauss_y * gauss_y)/(gauss_y * gauss_y + pdelt_y * pdelt_y)) +m_R; //计算卡尔曼增益
         estimate_y = kalmanGain_y * (currentLocation_y - lastLocation_y) + lastLocation_y;    //修正定位点
-        mdelt_y = Math.sqrt((1 - kalmanGain_y) * gauss_y * gauss_y);      //修正模型偏差
+        mdelt_y = Math.sqrt((1-kalmanGain_y) * gauss_y * gauss_y);      //修正模型偏差
 
-        LatLng latlng = new LatLng(estimate_y, estimate_x);
+        LatLng latlng = new LatLng(estimate_y,estimate_x);
 
 
         return latlng;
@@ -214,7 +207,8 @@ public class PathSmoothTool {
     /***************************卡尔曼滤波结束**********************************/
 
     /***************************抽稀算法*************************************/
-    private List<LatLng> reducerVerticalThreshold(List<LatLng> inPoints, float threshHold) {
+    private List<LatLng> reducerVerticalThreshold(List<LatLng> inPoints,
+                                          float threshHold) {
         if (inPoints == null) {
             return null;
         }
@@ -231,13 +225,12 @@ public class PathSmoothTool {
             }
             LatLng next = inPoints.get(i + 1);
             double distance = calculateDistanceFromPoint(cur, pre, next);
-            if (distance > threshHold) {
+            if (distance > threshHold){
                 ret.add(cur);
             }
         }
         return ret;
     }
-
     private static LatLng getLastLocation(List<LatLng> oneGraspList) {
         if (oneGraspList == null || oneGraspList.size() == 0) {
             return null;
@@ -249,12 +242,13 @@ public class PathSmoothTool {
 
     /**
      * 计算当前点到线的垂线距离
-     *
-     * @param p         当前点
+     * @param p 当前点
      * @param lineBegin 线的起点
-     * @param lineEnd   线的终点
+     * @param lineEnd 线的终点
+     *
      */
-    private static double calculateDistanceFromPoint(LatLng p, LatLng lineBegin, LatLng lineEnd) {
+    private static double calculateDistanceFromPoint(LatLng p, LatLng lineBegin,
+                                      LatLng lineEnd) {
         double A = p.longitude - lineBegin.longitude;
         double B = p.latitude - lineBegin.latitude;
         double C = lineEnd.longitude - lineBegin.longitude;
@@ -279,32 +273,31 @@ public class PathSmoothTool {
             xx = lineBegin.longitude + param * C;
             yy = lineBegin.latitude + param * D;
         }
-        return AMapUtils.calculateLineDistance(p, new LatLng(yy, xx));
+        return AMapUtils.calculateLineDistance(p,new LatLng(yy,xx));
     }
-
     /***************************抽稀算法结束*********************************/
 
     private List<LatLng> reduceNoisePoint(List<LatLng> inPoints, float threshHold) {
-        if (inPoints == null) {
-            return null;
-        }
-        if (inPoints.size() <= 2) {
-            return inPoints;
-        }
-        List<LatLng> ret = new ArrayList<LatLng>();
-        for (int i = 0; i < inPoints.size(); i++) {
-            LatLng pre = getLastLocation(ret);
-            LatLng cur = inPoints.get(i);
-            if (pre == null || i == inPoints.size() - 1) {
-                ret.add(cur);
-                continue;
+            if (inPoints == null) {
+                return null;
             }
-            LatLng next = inPoints.get(i + 1);
-            double distance = calculateDistanceFromPoint(cur, pre, next);
-            if (distance < threshHold) {
-                ret.add(cur);
+            if (inPoints.size() <= 2) {
+                return inPoints;
             }
+            List<LatLng> ret = new ArrayList<LatLng>();
+            for (int i = 0; i < inPoints.size(); i++) {
+                LatLng pre = getLastLocation(ret);
+                LatLng cur = inPoints.get(i);
+                if (pre == null || i == inPoints.size() - 1) {
+                    ret.add(cur);
+                    continue;
+                }
+                LatLng next = inPoints.get(i + 1);
+                double distance = calculateDistanceFromPoint(cur, pre, next);
+                if (distance < threshHold){
+                    ret.add(cur);
+                }
+            }
+            return ret;
         }
-        return ret;
-    }
 }
